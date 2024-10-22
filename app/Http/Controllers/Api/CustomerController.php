@@ -2,64 +2,65 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use Exception;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
- 
-//         return response()->json([
-//  'message' => 'hello',200
-
-//         ]);
-
-
         return response()->json(Customer::all(), 200);
     }
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:customers',
-            'email' => 'required|email|unique:customers',
-            'phone_number' => 'required|string|max:15',
-            'country' => 'required|string',
-            'state' => 'required|string',
-            'zip_code' => 'required|string|max:10',
-            'password' => 'required|string|min:6',
-        ]);
+        try {
 
-        $validatedData['password'] = bcrypt($validatedData['password']); // Hash the password
+            $validatedData = $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'username' => 'required|string|max:255|unique:customers',
+                'email' => 'required|email|unique:customers',
+                'phone_number' => 'required|string|max:15',
+                'country' => 'required|string',
+                'state' => 'required|string',
+                'zip_code' => 'required|string|max:10',
+                'password' => 'required|string|min:6',
+            ]);
 
-        $customer = Customer::create($validatedData);
-
-        return response()->json($customer, 201);
+            $validatedData['password'] = bcrypt($validatedData['password']);
+            $customer = Customer::create($validatedData);
+            return response()->json($customer, 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        };
     }
-
     public function show($id)
     {
-        $customer = Customer::find($id);
-
-        if (!$customer) {
-            return response()->json(['message' => 'Customer not found'], 404);
+        try {
+            $customer = Customer::find($id);
+            if (!$customer) {
+                return response()->json(['message' => 'Customer not found'], 404);
+            }
+            return response()->json($customer, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
         }
-
-        return response()->json($customer, 200);
     }
-
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         $customer = Customer::find($id);
 
         if (!$customer) {
             return response()->json(['message' => 'Customer not found'], 404);
         }
-
         $validatedData = $request->validate([
             'first_name' => 'sometimes|required|string|max:255',
             'last_name' => 'sometimes|required|string|max:255',
@@ -72,25 +73,32 @@ class CustomerController extends Controller
             'password' => 'sometimes|required|string|min:6',
         ]);
 
-        if ($request->has('password')) {
-            $validatedData['password'] = bcrypt($validatedData['password']);
+        try {
+            if ($request->has('password')) {
+                $validatedData['password'] = bcrypt($validatedData['password']);
+            }
+            $customer->update($validatedData);
+            return response()->json($customer, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
         }
-
-        $customer->update($validatedData);
-
-        return response()->json($customer, 200);
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         $customer = Customer::find($id);
-
         if (!$customer) {
             return response()->json(['message' => 'Customer not found'], 404);
         }
-
-        $customer->delete();
-
-        return response()->json(['message' => 'Customer deleted successfully'], 200);
+        try {
+            $customer->delete();
+            return response()->json(['message' => 'Customer deleted successfully'], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }

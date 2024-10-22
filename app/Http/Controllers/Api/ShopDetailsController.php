@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use Exception;
 use App\Models\ShopDetails;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ShopDetailsController extends Controller
 {
@@ -24,7 +25,7 @@ class ShopDetailsController extends Controller
             'city' => 'required|string|max:255',
             'country' => 'required|string|max:255',
             'zip_code' => 'required|string|max:10',
-            
+
             // Validation for company and bank details
             'company_name' => 'required|string|max:255',
             'company_type' => 'required|string|max:255',
@@ -34,9 +35,15 @@ class ShopDetailsController extends Controller
             'branch' => 'required|string|max:255',
             'account_holder_name' => 'required|string|max:255',
         ]);
+        try {
 
-        $shopDetails = ShopDetails::create($validatedData);
-        return response()->json($shopDetails, 201);
+            $shopDetails = ShopDetails::create($validatedData);
+            return response()->json($shopDetails, 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function show($id)
@@ -46,8 +53,13 @@ class ShopDetailsController extends Controller
         if (!$shopDetails) {
             return response()->json(['message' => 'Shop details not found'], 404);
         }
-
-        return response()->json($shopDetails, 200);
+        try {
+            return response()->json($shopDetails, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function update(Request $request, $id)
@@ -70,8 +82,15 @@ class ShopDetailsController extends Controller
             'account_number' => 'sometimes|required|string|unique:shop_details,account_number,' . $id,
         ]);
 
-        $shopDetails->update($validatedData);
-        return response()->json($shopDetails, 200);
+        try {
+
+            $shopDetails->update($validatedData);
+            return response()->json($shopDetails, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function destroy($id)
@@ -81,8 +100,13 @@ class ShopDetailsController extends Controller
         if (!$shopDetails) {
             return response()->json(['message' => 'Shop details not found'], 404);
         }
-
-        $shopDetails->delete();
-        return response()->json(['message' => 'Shop details deleted successfully'], 200);
+        try {
+            $shopDetails->delete();
+            return response()->json(['message' => 'Shop details deleted successfully'], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }

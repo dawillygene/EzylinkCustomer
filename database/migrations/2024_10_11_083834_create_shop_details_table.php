@@ -30,6 +30,10 @@ class CreateShopDetailsTable extends Migration
             $table->string('website')->nullable();
             $table->string('number')->nullable();
             $table->string('company_logo')->nullable();
+            $table->string('cover_image')->nullable();
+            $table->string('openingTime')->nullable();
+            $table->string(column: 'closingTime')->nullable();
+            $table->string(column: 'rating')->nullable();
 
             // Bank Details
             $table->string('bank_name');
