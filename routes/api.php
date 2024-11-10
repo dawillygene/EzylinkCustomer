@@ -22,23 +22,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('shop_details', ShopDetailsController::class);
 
 
-
+    Route::apiResource('addresses', AddressController::class);
+    Route::apiResource('orders', OrderController::class);
+    Route::apiResource('orders.items', OrderItemController::class);
+    
 
    
 });
-
-
-
-
-
-
-Route::apiResource('addresses', AddressController::class);
-Route::apiResource('orders', OrderController::class);
-Route::apiResource('orders.items', OrderItemController::class);
-
-
-
-
 
 
 
