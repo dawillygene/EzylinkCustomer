@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -6,27 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    /** @use HasFactory<\Database\Factories\OrdersFactory> */
     use HasFactory;
-
+    protected $table = 'orders';
+    protected $primaryKey = 'order_id';
     protected $fillable = [
-        'delivery_address_id',
-        'location',
-        'category',
-        'restaurant',
+        'id',
+        'order_date',
         'total_price',
-        'payment_method',
+        'status',
         'delivery_address',
+        'delivery_slot',
     ];
 
-
-    public function items()
+ public $timestamps = false;
+ 
+    public function user()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->belongsTo(User::class, 'id', 'id');
     }
 
-
-    public function address()
+    public function orderItems()
     {
-        return $this->belongsTo(Address::class, 'delivery_address_id');
+        return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
     }
 }

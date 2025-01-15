@@ -7,25 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
+    /** @use HasFactory<\Database\Factories\AddressFactory> */
     use HasFactory;
-
+    protected $table = 'addresses';
+    protected $primaryKey = 'address_id';
     protected $fillable = [
-        'user_id',
-        'type',
-        'address',
+        'address_line1',
+        'address_line2',
         'city',
-        'postal_code',
-        'active',
+        'state',
+        'zip_code',
+        'country',
     ];
 
+    public $timestamps = false;
 
-    public function orders()
-    {
-        return $this->hasMany(Order::class, 'delivery_address_id');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }
